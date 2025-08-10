@@ -1,0 +1,13 @@
+CompileFlags:
+  Remove: [-mpreferred-stack-boundary=3, -mindirect-branch=thunk-extern, -mindirect-branch-register, -fno-allow-store-data-races, -fconserve-stack, -mrecord-mcount, -fmin-function-alignment=16]
+  Add:
+    - -I/lib/modules/6.15.9-arch1-1/build/include
+    - -I/lib/modules/6.15.9-arch1-1/build/arch/x86/include/
+    - -I/lib/modules/6.15.9-arch1-1/build/arch/x86/include/generated/
+    - -D__KERNEL__
+    - -DMODULE
+    - -include
+    - -D__linux__
+    # - /usr/lib/modules/6.15.9-arch1-1/build/include/linux/kconfig.h
+    - -Wno-error=incomplete-type
+    - -Wno-error=undefined-internal

@@ -1,0 +1,9 @@
+*/test
+*.o
+*.ko
+.ropeproject/
+*.cmd
+*.symvers
+*.order
+*.mod.c
+*.mod
