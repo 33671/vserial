@@ -11,3 +11,4 @@ pkg/
 vserialctl
 vserial/
 src/
+*.tar.zst
