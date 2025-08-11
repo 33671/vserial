@@ -47,7 +47,6 @@ struct vserial_pairs_info {
 
 // Global data
 static struct tty_driver *tty_driver; // Our TTY driver
-static atomic_t vserial_index_counter = ATOMIC_INIT(0);
 
 // Pair management
 static DEFINE_MUTEX(port_mutex);
@@ -458,8 +457,6 @@ static long vserial_ctl_ioctl(struct file *file, unsigned int cmd,
                                                      port->indexA, NULL);
       struct device *devB = tty_port_register_device(&port->portB, tty_driver,
                                                      port->indexB, NULL);
-      dev_set_uevent_suppress(devA, false);
-      dev_set_uevent_suppress(devB, false);
       if (IS_ERR(devA) || IS_ERR(devB)) {
         printk(KERN_ERR "vserial: Failed to register devices for pair %d: %d\n",
                 i, ret);
@@ -476,6 +473,8 @@ static long vserial_ctl_ioctl(struct file *file, unsigned int cmd,
         ret = PTR_ERR(devA) ?: PTR_ERR(devB);
         goto free_ports;
       }
+      dev_set_uevent_suppress(devA, false);
+      dev_set_uevent_suppress(devB, false);
       printk(KERN_INFO "vserial: No error for pair %d",i);
 
       port->termiosA = tty_driver->init_termios;
@@ -657,5 +656,5 @@ static void __exit vserial_exit(void) {
 module_init(vserial_init);
 module_exit(vserial_exit);
 MODULE_DESCRIPTION("A virtual serial port driver");
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("GPL v2");
 MODULE_AUTHOR("zz z");

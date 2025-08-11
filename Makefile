@@ -1,6 +1,5 @@
 KVERSION ?= $(shell uname -r)
 KDIR ?= /lib/modules/$(KVERSION)/build
-obj-m += vserial.o
 
 modules:
 	$(MAKE) -C $(KDIR) M=$$(pwd) modules

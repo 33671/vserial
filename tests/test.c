@@ -331,13 +331,6 @@ int main() {
     }
     printf("Created %d virtual serial pairs\n", pair_count);
 
-    // Note: Removed ls/sleep calls as they're unnecessary for multiple pair testing
-    // Original code had:
-    //   system("ls -l /dev/tty_vserial0");
-    //   sleep(1);
-    //   system("ls -l /dev/tty_vserial0");
-    // But these are device-specific and not needed for multi-pair testing
-
     // 3. Get information about created pairs
     info.num_pairs = 0;
     info.pairs = NULL;
@@ -385,7 +378,10 @@ int main() {
         printf("  TESTING VIRTUAL PAIR #%d (minorA=%d, minorB=%d)\n",
                pair_idx, info.pairs[pair_idx].minorA, info.pairs[pair_idx].minorB);
         printf("==================================================\n");
+        system("ls -l /dev/tty_vserial0");
+        // race conditions, wait for udev to finish
         sleep(1);
+        system("ls -l /dev/tty_vserial0");
         // Open first port in the pair (A)
         snprintf(dev_path, sizeof(dev_path), "/dev/tty_vserial%d", info.pairs[pair_idx].minorA);
         fdA = open(dev_path, O_RDWR | O_NOCTTY | O_NONBLOCK);

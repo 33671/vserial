@@ -1,2 +1,2 @@
-ACTION=="add",KERNEL=="vserialctl", GROUP="uucp", MODE="0660"
-ACTION=="add",KERNEL=="tty_vserial[0-9]*", GROUP="uucp", MODE="0660"
+SUBSYSTEM=="misc", ACTION=="add", KERNEL=="vserialctl", GROUP="uucp", MODE="0660"
+SUBSYSTEM=="tty", ACTION=="add", KERNEL=="tty_vserial[0-9]*", GROUP="uucp", MODE="0660"
