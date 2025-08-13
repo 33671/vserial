@@ -39,7 +39,7 @@ build() {
 }
 post_install() {
     systemctl daemon-reload
-    systemctl enable --now vserial.service
+    #systemctl enable --now vserial.service
 }
 
 pre_remove() {

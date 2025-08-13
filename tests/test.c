@@ -7,7 +7,7 @@
  * when configurations mismatch (with subsequent recovery test).
  *
  * Compile with: gcc -o vserial_test vserial_test.c
- * Requires: /dev/vserialctl and /dev/tty_vserial* devices
+ * Requires: /dev/vserialctl and /dev/ttySV* devices
  */
 
 #include <stdio.h>
@@ -378,12 +378,12 @@ int main() {
         printf("  TESTING VIRTUAL PAIR #%d (minorA=%d, minorB=%d)\n",
                pair_idx, info.pairs[pair_idx].minorA, info.pairs[pair_idx].minorB);
         printf("==================================================\n");
-        system("ls -l /dev/tty_vserial0");
+        system("ls -l /dev/ttySV0");
         // race conditions, wait for udev to finish
         sleep(1);
-        system("ls -l /dev/tty_vserial0");
+        system("ls -l /dev/ttySV0");
         // Open first port in the pair (A)
-        snprintf(dev_path, sizeof(dev_path), "/dev/tty_vserial%d", info.pairs[pair_idx].minorA);
+        snprintf(dev_path, sizeof(dev_path), "/dev/ttySV%d", info.pairs[pair_idx].minorA);
         fdA = open(dev_path, O_RDWR | O_NOCTTY | O_NONBLOCK);
         if (fdA < 0) {
             perror("Failed to open port A");
@@ -393,7 +393,7 @@ int main() {
         printf("  Opened %s\n", dev_path);
 
         // Open second port in the pair (B)
-        snprintf(dev_path, sizeof(dev_path), "/dev/tty_vserial%d", info.pairs[pair_idx].minorB);
+        snprintf(dev_path, sizeof(dev_path), "/dev/ttySV%d", info.pairs[pair_idx].minorB);
         fdB = open(dev_path, O_RDWR | O_NOCTTY | O_NONBLOCK);
         if (fdB < 0) {
             perror("Failed to open port B");

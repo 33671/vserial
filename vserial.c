@@ -53,22 +53,9 @@ static DEFINE_MUTEX(port_mutex);
 static struct vserial_port **port_array = NULL;
 static int current_num_pairs = 0;
 
-/**
- * vserial_termios_match - Check if two serial configurations are compatible
- * @tx: Transmitter's termios settings
- * @rx: Receiver's termios settings
- *
- * Compares critical physical layer settings between transmitter and receiver:
- * - Baud rates (c_ospeed must match c_ispeed)
- * - Data bits (CSIZE: 5/6/7/8 bits)
- * - Parity (PARENB + PARODD)
- * - Stop bits (CSTOPB)
- *
- * Returns true if configurations are compatible for data transfer
- */
 static inline bool vserial_termios_match(const struct ktermios *tx,
                                          const struct ktermios *rx) {
-  /* Baud rate check: transmitter output must match receiver input */
+  /* Baud rate check */
   if (tx->c_ospeed != rx->c_ispeed) {
     printk(KERN_DEBUG
            "vserial: BAUD MISMATCH: tx->c_ospeed=%d, rx->c_ispeed=%d\n",
@@ -308,6 +295,7 @@ static int vserial_ioctl(struct tty_struct *tty, unsigned int cmd,
 
   switch (cmd) {
   case TIOCGSERIAL:
+    // return fake data as its not supported
     memset(&ss, 0, sizeof(ss));
     ss.baud_base = 115200;
     if (copy_to_user((void __user *)arg, &ss, sizeof(ss))) {
@@ -332,10 +320,11 @@ static int vserial_ioctl(struct tty_struct *tty, unsigned int cmd,
 
   case TIOCMSET:
     return 0;
-  case TCSETS:
-  case TCSETSW:
-  case TCSETSF:
-    return 0;
+    // handled by tty set_termios
+    // case TCSETS:
+    // case TCSETSW:
+    // case TCSETSF:
+    //   return 0;
   }
   printk(KERN_DEBUG "vserial: IOCTL 0x%08x not handled for %s\n", cmd, end);
   return -ENOIOCTLCMD;
@@ -447,19 +436,19 @@ static long vserial_ctl_ioctl(struct file *file, unsigned int cmd,
 
       tty_port_init(&port->portA);
       port->portA.ops = &vserial_port_ops;
-      printk(KERN_INFO "vserial: Initializing ports for pair %d",i);
+      printk(KERN_INFO "vserial: Initializing ports for pair %d", i);
       tty_port_init(&port->portB);
       port->portB.ops = &vserial_port_ops;
 
       // Register devices with proper error checking
-      printk(KERN_INFO "vserial: Registering devices for pair %d",i);
+      printk(KERN_INFO "vserial: Registering devices for pair %d", i);
       struct device *devA = tty_port_register_device(&port->portA, tty_driver,
                                                      port->indexA, NULL);
       struct device *devB = tty_port_register_device(&port->portB, tty_driver,
                                                      port->indexB, NULL);
       if (IS_ERR(devA) || IS_ERR(devB)) {
         printk(KERN_ERR "vserial: Failed to register devices for pair %d: %d\n",
-                i, ret);
+               i, ret);
         // Unregister any successfully registered device
         if (!IS_ERR(devA))
           tty_port_unregister_device(&port->portA, tty_driver, port->indexA);
@@ -475,7 +464,7 @@ static long vserial_ctl_ioctl(struct file *file, unsigned int cmd,
       }
       dev_set_uevent_suppress(devA, false);
       dev_set_uevent_suppress(devB, false);
-      printk(KERN_INFO "vserial: No error for pair %d",i);
+      printk(KERN_INFO "vserial: No error for pair %d", i);
 
       port->termiosA = tty_driver->init_termios;
       port->termiosB = tty_driver->init_termios;
@@ -568,7 +557,7 @@ static struct miscdevice ctl_device = {
 // Module initialization
 static int __init vserial_init(void) {
   int ret;
-
+  printk(KERN_INFO "vserial: hello\n");
   printk(KERN_INFO "vserial: [INIT] Starting module initialization\n");
   // Allocate driver with MAX_PORTS (64 pairs = 128 ports)
   tty_driver =
@@ -580,7 +569,7 @@ static int __init vserial_init(void) {
   }
 
   tty_driver->driver_name = "vserial";
-  tty_driver->name = "tty_vserial";
+  tty_driver->name = "ttySV";
   tty_driver->major = 0;
   tty_driver->minor_start = 0;
   tty_driver->type = TTY_DRIVER_TYPE_SERIAL;

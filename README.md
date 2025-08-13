@@ -1,12 +1,13 @@
-#Virtual Serial Port Kernel Module
+# Virtual Serial Port Kernel Module
 
 ## Introduction
 
 This module creates virtual serialport pairs that can be used for communication between user space applications.
-Features:
+
+### Features:
 
 - [x] Support for multiple virtual port pairs
-- [x] Support setting different baudrates and data formats(drop data silently if not matched)
+- [x] Support setting different baudrates and data formats(drops data silently if not matched)
 - [x] a simple program for user-space management
 - [ ] soft/hard flow control
 - [ ] modem ioctl
@@ -48,20 +49,22 @@ Features:
 6. Add virtual port pairs using vserialctl:
 
    ```bash
-   ./vserialctl -c 1
+   ./vserialctl -s 1
    ```
 
 7. Test
 
-  ```bash
-  cat /dev/tty_vserial1
-  #run in a new terminal
-  echo "Hello, World!" > /dev/tty_vserial0
-  ```
+   ```bash
+   #115200 8N1 by default
+   cat /dev/ttySV1
+   #run in a new terminal
+   echo "Hello, World!" > /dev/ttySV0
+   ```
 
 ## Install from AUR (Arch linux)
 
-  ```bash
-  # this will also add vserialctl to PATH
-  paru -S vserial
-  ```
+   ```bash
+   # this will also add vserialctl to PATH
+   paru -S vserial
+   sudo systemctl enable vserial --now
+   ```
