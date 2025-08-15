@@ -10,11 +10,10 @@ license=('GPL-2.0-or-later')
 depends=('dkms' 'systemd')
 makedepends=('linux-headers' 'gcc')
 source=("vserial::git+https://github.com/33671/vserial"
-        "vserial.service"
         "dkms.conf"
         "vserialctl.c"
-        "vserial.conf")
-sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
+        "vserial_startup.conf")
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 prepare() {
     cd "$srcdir/vserial"
@@ -27,7 +26,7 @@ package() {
     cp -a --parents *.c Makefile Kbuild 99-vserial.rules "$dkmsdir"
     cd "$srcdir"
     install -Dm644 dkms.conf "$dkmsdir/dkms.conf"
-    install -Dm644 vserial_startup.conf "$dkmsdir/etc/modules-load.d/vserial.conf"
+    install -Dm644 vserial_startup.conf "$pkgdir/etc/modules-load.d/vserial.conf"
     install -Dm644 "$srcdir/vserial/99-vserial.rules" \
                    "$pkgdir/usr/lib/udev/rules.d/99-vserial.rules"
     install -Dm755 "$srcdir/vserialctl" "$pkgdir/usr/bin/vserialctl"
@@ -38,8 +37,6 @@ build() {
     make -C /lib/modules/$(uname -r)/build M="$PWD" modules
     cd "$srcdir"
     gcc -o vserialctl "$srcdir/vserialctl.c"
-}
-post_install() {
 }
 
 pre_remove() {
