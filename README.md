@@ -8,7 +8,7 @@ This module creates virtual serialport pairs that can be used for communication 
 
 - [x] Support for multiple virtual port pairs
 - [x] Support setting different baudrates and data formats(drops data silently if not matched)
-- [x] a simple program for user-space management
+- [x] simple program for user-space management
 - [ ] soft/hard flow control
 - [ ] modem ioctl
 
@@ -46,7 +46,7 @@ This module creates virtual serialport pairs that can be used for communication 
    gcc -o vserialctl vserialctl.c
    ```
 
-6. Add virtual port pairs using vserialctl:
+6. Setup virtual port pairs using vserialctl:
 
    ```bash
    ./vserialctl -s 1
@@ -56,15 +56,13 @@ This module creates virtual serialport pairs that can be used for communication 
 
    ```bash
    #115200 8N1 by default
-   cat /dev/ttySV1
+   cat /dev/ttyGSV1
    #run in a new terminal
-   echo "Hello, World!" > /dev/ttySV0
+   echo "Hello, World!" > /dev/ttyGSV0
    ```
 
 ## Install from AUR (Arch linux)
 
    ```bash
-   # this will also add vserialctl to PATH
    paru -S vserial
-   sudo systemctl enable vserial --now
    ```

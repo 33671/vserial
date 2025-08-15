@@ -12,8 +12,9 @@ makedepends=('linux-headers' 'gcc')
 source=("vserial::git+https://github.com/33671/vserial"
         "vserial.service"
         "dkms.conf"
-        "vserialctl.c")
-sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP')
+        "vserialctl.c"
+        "vserial.conf")
+sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 prepare() {
     cd "$srcdir/vserial"
@@ -26,10 +27,11 @@ package() {
     cp -a --parents *.c Makefile Kbuild 99-vserial.rules "$dkmsdir"
     cd "$srcdir"
     install -Dm644 dkms.conf "$dkmsdir/dkms.conf"
-    install -Dm644 vserial.service "$pkgdir/usr/lib/systemd/system/vserial.service"
+    install -Dm644 vserial_startup.conf "$dkmsdir/etc/modules-load.d/vserial.conf"
     install -Dm644 "$srcdir/vserial/99-vserial.rules" \
                    "$pkgdir/usr/lib/udev/rules.d/99-vserial.rules"
     install -Dm755 "$srcdir/vserialctl" "$pkgdir/usr/bin/vserialctl"
+
 }
 build() {
     cd "$srcdir/vserial"
@@ -38,8 +40,6 @@ build() {
     gcc -o vserialctl "$srcdir/vserialctl.c"
 }
 post_install() {
-    systemctl daemon-reload
-    #systemctl enable --now vserial.service
 }
 
 pre_remove() {

@@ -123,7 +123,7 @@ int main(int argc, char **argv) {
 
   printf("Successfully created %d virtual serial pairs:\n", info.num_pairs);
   for (int i = 0; i < info.num_pairs; i++) {
-    printf("Pair %d: /dev/ttySV%d <-> /dev/ttySV%d\n", i,
+    printf("Pair %d: /dev/ttyGSV%d <-> /dev/ttyGSV%d\n", i,
            info.pairs[i].minorA, info.pairs[i].minorB);
   }
 

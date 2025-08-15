@@ -57,18 +57,18 @@ static inline bool vserial_termios_match(const struct ktermios *tx,
                                          const struct ktermios *rx) {
   /* Baud rate check */
   if (tx->c_ospeed != rx->c_ispeed) {
-    printk(KERN_DEBUG
-           "vserial: BAUD MISMATCH: tx->c_ospeed=%d, rx->c_ispeed=%d\n",
-           tx->c_ospeed, rx->c_ispeed);
+    // printk(KERN_DEBUG
+    //        "vserial: BAUD MISMATCH: tx->c_ospeed=%d, rx->c_ispeed=%d\n",
+    //        tx->c_ospeed, rx->c_ispeed);
     return false;
   }
 
   /* Data format check (mask only relevant bits) */
   if ((tx->c_cflag & VSERIAL_TERMIOS_MASK) !=
       (rx->c_cflag & VSERIAL_TERMIOS_MASK)) {
-    printk(KERN_DEBUG "vserial: FORMAT MISMATCH: tx_cflag=0x%x, rx_cflag=0x%x "
-                      "(masked: 0x%x)\n",
-           tx->c_cflag, rx->c_cflag, VSERIAL_TERMIOS_MASK);
+    // printk(KERN_DEBUG "vserial: FORMAT MISMATCH: tx_cflag=0x%x, rx_cflag=0x%x "
+    //                   "(masked: 0x%x)\n",
+    //        tx->c_cflag, rx->c_cflag, VSERIAL_TERMIOS_MASK);
     return false;
   }
 
@@ -77,7 +77,7 @@ static inline bool vserial_termios_match(const struct ktermios *tx,
 
 // TTY port operations
 static void vserial_port_destruct(struct tty_port *port) {
-  printk(KERN_INFO "vserial: port destruct called\n");
+  //printk(KERN_INFO "vserial: port destruct called\n");
 }
 
 static const struct tty_port_operations vserial_port_ops = {
@@ -92,8 +92,8 @@ static int vserial_open(struct tty_struct *tty, struct file *filp) {
   int within_pair = minor % 2;
   int ret;
 
-  printk(KERN_INFO "vserial: OPEN request for index=%d (name=%s)\n", minor,
-         tty->driver->name);
+  //printk(KERN_INFO "vserial: OPEN request for index=%d (name=%s)\n", minor,
+  //       tty->driver->name);
 
   mutex_lock(&port_mutex);
   if (pair_index >= current_num_pairs) {
@@ -111,8 +111,8 @@ static int vserial_open(struct tty_struct *tty, struct file *filp) {
   }
   tty->driver_data = port;
 
-  printk(KERN_INFO "vserial: Found port '%s' for index=%d (A=%d, B=%d)\n",
-         port->name, minor, port->indexA, port->indexB);
+  //printk(KERN_INFO "vserial: Found port '%s' for index=%d (A=%d, B=%d)\n",
+  //       port->name, minor, port->indexA, port->indexB);
   // FIXME: potential race condition
   ret = tty_port_open(tty->port, tty, filp);
   if (ret == 0) {
@@ -120,20 +120,20 @@ static int vserial_open(struct tty_struct *tty, struct file *filp) {
     if (within_pair == 0) {
       port->termiosA = tty->termios;
       port->open_count++;
-      printk(KERN_INFO "vserial: Port A (%d) OPENED for '%s', count=%d\n",
-             port->indexA, port->name, port->open_count);
+      // printk(KERN_INFO "vserial: Port A (%d) OPENED for '%s', count=%d\n",
+      //        port->indexA, port->name, port->open_count);
     } else {
       port->termiosB = tty->termios;
       port->open_count++;
-      printk(KERN_INFO "vserial: Port B (%d) OPENED for '%s', count=%d\n",
-             port->indexB, port->name, port->open_count);
+      // printk(KERN_INFO "vserial: Port B (%d) OPENED for '%s', count=%d\n",
+      //        port->indexB, port->name, port->open_count);
     }
     spin_unlock(&port->lock);
 
     // Log the termios settings
-    printk(KERN_DEBUG
-           "vserial: termios: c_ispeed=%d, c_ospeed=%d, c_cflag=0x%x\n",
-           tty->termios.c_ispeed, tty->termios.c_ospeed, tty->termios.c_cflag);
+    // printk(KERN_DEBUG
+    //        "vserial: termios: c_ispeed=%d, c_ospeed=%d, c_cflag=0x%x\n",
+    //        tty->termios.c_ispeed, tty->termios.c_ospeed, tty->termios.c_cflag);
   } else {
     printk(KERN_ERR "vserial: OPEN failed for index=%d with error %d\n", minor,
            ret);
@@ -147,18 +147,18 @@ static void vserial_close(struct tty_struct *tty, struct file *filp) {
   int minor = tty->index;
   int within_pair = minor % 2;
 
-  printk(KERN_INFO "vserial: CLOSE request for index=%d\n", minor);
+  // printk(KERN_INFO "vserial: CLOSE request for index=%d\n", minor);
 
   if (port) {
     spin_lock(&port->lock);
     if (within_pair == 0) {
       port->open_count--;
-      printk(KERN_INFO "vserial: Port A (%d) CLOSED for '%s', count=%d\n",
-             port->indexA, port->name, port->open_count);
+      // printk(KERN_INFO "vserial: Port A (%d) CLOSED for '%s', count=%d\n",
+      //        port->indexA, port->name, port->open_count);
     } else {
       port->open_count--;
-      printk(KERN_INFO "vserial: Port B (%d) CLOSED for '%s', count=%d\n",
-             port->indexB, port->name, port->open_count);
+      // printk(KERN_INFO "vserial: Port B (%d) CLOSED for '%s', count=%d\n",
+      //        port->indexB, port->name, port->open_count);
     }
     spin_unlock(&port->lock);
 
@@ -180,8 +180,8 @@ static ssize_t vserial_write(struct tty_struct *tty, const u8 *buf,
   const char *direction;
   char log_buf[64];
 
-  printk(KERN_DEBUG "vserial: WRITE request for index=%d, count=%zu\n", index,
-         count);
+  // printk(KERN_DEBUG "vserial: WRITE request for index=%d, count=%zu\n", index,
+  //        count);
 
   if (!vserial_port_) {
     printk(KERN_ERR "vserial: WRITE failed - no port data for index=%d\n",
@@ -224,8 +224,8 @@ static ssize_t vserial_write(struct tty_struct *tty, const u8 *buf,
   size_t log_len = min(count, (size_t)32);
   memcpy(log_buf, buf, log_len);
   log_buf[log_len] = '\0';
-  printk(KERN_DEBUG "vserial: Writing %zu bytes %s: '%*pE'\n", count, direction,
-         (int)log_len, log_buf);
+  // printk(KERN_DEBUG "vserial: Writing %zu bytes %s: '%*pE'\n", count, direction,
+  //        (int)log_len, log_buf);
   if (!tty_port_initialized(dest_port)) {
     ret = count;
     printk(KERN_WARNING "vserial: Data dropped (destination is closed)\n");
@@ -235,8 +235,8 @@ static ssize_t vserial_write(struct tty_struct *tty, const u8 *buf,
   if (tty_port_initialized(dest_port)) {
     size_t pushed = tty_insert_flip_string(dest_port, buf, count);
     tty_flip_buffer_push(dest_port);
-    printk(KERN_DEBUG "vserial: Pushed %zu/%zu bytes %s\n", pushed, count,
-           direction);
+    // printk(KERN_DEBUG "vserial: Pushed %zu/%zu bytes %s\n", pushed, count,
+    //        direction);
     ret = pushed;
   } else {
     printk(KERN_WARNING "vserial: Destination port not initialized for %s\n",
@@ -263,10 +263,10 @@ static void vserial_set_termios(struct tty_struct *tty,
     return;
   }
 
-  printk(KERN_INFO "vserial: SET_TERMIOS for %s (index=%d), ispeed=%d, "
-                   "ospeed=%d, cflag=0x%x\n",
-         end, index, tty->termios.c_ispeed, tty->termios.c_ospeed,
-         tty->termios.c_cflag);
+  // printk(KERN_INFO "vserial: SET_TERMIOS for %s (index=%d), ispeed=%d, "
+  //                  "ospeed=%d, cflag=0x%x\n",
+  //        end, index, tty->termios.c_ispeed, tty->termios.c_ospeed,
+  //        tty->termios.c_cflag);
 
   spin_lock(&port->lock);
   if (within_pair == 0)
@@ -290,8 +290,8 @@ static int vserial_ioctl(struct tty_struct *tty, unsigned int cmd,
     return -ENODEV;
   }
 
-  printk(KERN_DEBUG "vserial: IOCTL 0x%08x for %s (index=%d)\n", cmd, end,
-         index);
+  // printk(KERN_DEBUG "vserial: IOCTL 0x%08x for %s (index=%d)\n", cmd, end,
+  //        index);
 
   switch (cmd) {
   case TIOCGSERIAL:
@@ -302,8 +302,8 @@ static int vserial_ioctl(struct tty_struct *tty, unsigned int cmd,
       printk(KERN_ERR "vserial: TIOCGSERIAL failed (EFAULT)\n");
       return -EFAULT;
     }
-    printk(KERN_DEBUG "vserial: TIOCGSERIAL returned baud_base=%d\n",
-           ss.baud_base);
+    // printk(KERN_DEBUG "vserial: TIOCGSERIAL returned baud_base=%d\n",
+    //        ss.baud_base);
     return 0;
 
   case TIOCSSERIAL:
@@ -311,8 +311,8 @@ static int vserial_ioctl(struct tty_struct *tty, unsigned int cmd,
       printk(KERN_ERR "vserial: TIOCSSERIAL failed (EFAULT)\n");
       return -EFAULT;
     }
-    printk(KERN_DEBUG "vserial: TIOCSSERIAL received baud_base=%d\n",
-           ss.baud_base);
+    // printk(KERN_DEBUG "vserial: TIOCSSERIAL received baud_base=%d\n",
+    //        ss.baud_base);
     return 0;
   // TODO: modem control
   case TIOCMGET:
@@ -326,7 +326,7 @@ static int vserial_ioctl(struct tty_struct *tty, unsigned int cmd,
     // case TCSETSF:
     //   return 0;
   }
-  printk(KERN_DEBUG "vserial: IOCTL 0x%08x not handled for %s\n", cmd, end);
+  // printk(KERN_DEBUG "vserial: IOCTL 0x%08x not handled for %s\n", cmd, end);
   return -ENOIOCTLCMD;
 }
 static unsigned int vserial_write_room(struct tty_struct *tty) { return 4096; }
@@ -370,8 +370,8 @@ static long vserial_ctl_ioctl(struct file *file, unsigned int cmd,
       goto out;
     }
 
-    printk(KERN_INFO "vserial: SET_PAIRS: new_num=%d, current=%d\n", new_num,
-           current_num_pairs);
+    // printk(KERN_INFO "vserial: SET_PAIRS: new_num=%d, current=%d\n", new_num,
+    //        current_num_pairs);
 
     // Remove existing pairs if any
     if (port_array) {
@@ -393,9 +393,9 @@ static long vserial_ctl_ioctl(struct file *file, unsigned int cmd,
       // Now remove the ports
       for (i = 0; i < current_num_pairs; i++) {
         struct vserial_port *port = port_array[i];
-        printk(KERN_INFO
-               "vserial: SET_PAIRS: removing port '%s' (A=%d, B=%d)\n",
-               port->name, port->indexA, port->indexB);
+        // printk(KERN_INFO
+        //        "vserial: SET_PAIRS: removing port '%s' (A=%d, B=%d)\n",
+        //        port->name, port->indexA, port->indexB);
         tty_port_unregister_device(&port->portA, tty_driver, port->indexA);
         tty_port_unregister_device(&port->portB, tty_driver, port->indexB);
         tty_port_destroy(&port->portA);
@@ -430,18 +430,18 @@ static long vserial_ctl_ioctl(struct file *file, unsigned int cmd,
       port->indexA = i * 2;
       port->indexB = i * 2 + 1;
 
-      printk(KERN_INFO
-             "vserial: SET_PAIRS: allocating indices A=%d, B=%d for '%s'\n",
-             port->indexA, port->indexB, port->name);
+      // printk(KERN_INFO
+      //        "vserial: SET_PAIRS: allocating indices A=%d, B=%d for '%s'\n",
+      //        port->indexA, port->indexB, port->name);
 
       tty_port_init(&port->portA);
       port->portA.ops = &vserial_port_ops;
-      printk(KERN_INFO "vserial: Initializing ports for pair %d", i);
+      // printk(KERN_INFO "vserial: Initializing ports for pair %d", i);
       tty_port_init(&port->portB);
       port->portB.ops = &vserial_port_ops;
 
       // Register devices with proper error checking
-      printk(KERN_INFO "vserial: Registering devices for pair %d", i);
+      // printk(KERN_INFO "vserial: Registering devices for pair %d", i);
       struct device *devA = tty_port_register_device(&port->portA, tty_driver,
                                                      port->indexA, NULL);
       struct device *devB = tty_port_register_device(&port->portB, tty_driver,
@@ -464,7 +464,7 @@ static long vserial_ctl_ioctl(struct file *file, unsigned int cmd,
       }
       dev_set_uevent_suppress(devA, false);
       dev_set_uevent_suppress(devB, false);
-      printk(KERN_INFO "vserial: No error for pair %d", i);
+      // printk(KERN_INFO "vserial: No error for pair %d", i);
 
       port->termiosA = tty_driver->init_termios;
       port->termiosB = tty_driver->init_termios;
@@ -536,7 +536,7 @@ static long vserial_ctl_ioctl(struct file *file, unsigned int cmd,
     break;
   }
   default:
-    printk(KERN_DEBUG "vserial: CTL IOCTL 0x%08x not handled\n", cmd);
+    // printk(KERN_DEBUG "vserial: CTL IOCTL 0x%08x not handled\n", cmd);
     ret = -ENOTTY;
     break;
   }
@@ -557,8 +557,7 @@ static struct miscdevice ctl_device = {
 // Module initialization
 static int __init vserial_init(void) {
   int ret;
-  printk(KERN_INFO "vserial: hello\n");
-  printk(KERN_INFO "vserial: [INIT] Starting module initialization\n");
+  // printk(KERN_INFO "vserial: [INIT] Starting module initialization\n");
   // Allocate driver with MAX_PORTS (64 pairs = 128 ports)
   tty_driver =
       tty_alloc_driver(128, TTY_DRIVER_REAL_RAW | TTY_DRIVER_DYNAMIC_DEV);
@@ -569,7 +568,7 @@ static int __init vserial_init(void) {
   }
 
   tty_driver->driver_name = "vserial";
-  tty_driver->name = "ttySV";
+  tty_driver->name = "ttyGSV";
   tty_driver->major = 0;
   tty_driver->minor_start = 0;
   tty_driver->type = TTY_DRIVER_TYPE_SERIAL;
@@ -584,8 +583,8 @@ static int __init vserial_init(void) {
     tty_driver_kref_put(tty_driver);
     return ret;
   }
-  printk(KERN_INFO "vserial: [INIT] registered with major %d, name='%s'\n",
-         tty_driver->major, tty_driver->name);
+  // printk(KERN_INFO "vserial: [INIT] registered with major %d, name='%s'\n",
+  //        tty_driver->major, tty_driver->name);
 
   ret = misc_register(&ctl_device);
   if (ret) {
@@ -594,8 +593,8 @@ static int __init vserial_init(void) {
     tty_driver_kref_put(tty_driver);
     return ret;
   }
-  printk(KERN_INFO "vserial: [INIT] control device created at /dev/%s\n",
-         ctl_device.name);
+  // printk(KERN_INFO "vserial: [INIT] control device created at /dev/%s\n",
+  //        ctl_device.name);
 
   // Initialize global state
   mutex_init(&port_mutex);
@@ -608,17 +607,17 @@ static int __init vserial_init(void) {
 static void __exit vserial_exit(void) {
   int i;
 
-  printk(KERN_INFO "vserial: [CLEANUP] Starting module cleanup\n");
+  // printk(KERN_INFO "vserial: [CLEANUP] Starting module cleanup\n");
 
   misc_deregister(&ctl_device);
-  printk(KERN_INFO "vserial: [CLEANUP] Control device unregistered\n");
+  // printk(KERN_INFO "vserial: [CLEANUP] Control device unregistered\n");
 
   mutex_lock(&port_mutex);
   if (port_array) {
     for (i = 0; i < current_num_pairs; i++) {
       struct vserial_port *port = port_array[i];
-      printk(KERN_INFO "vserial: [CLEANUP] Removing port '%s' (A=%d, B=%d)\n",
-             port->name, port->indexA, port->indexB);
+      // printk(KERN_INFO "vserial: [CLEANUP] Removing port '%s' (A=%d, B=%d)\n",
+      //        port->name, port->indexA, port->indexB);
       tty_port_unregister_device(&port->portA, tty_driver, port->indexA);
       tty_port_unregister_device(&port->portB, tty_driver, port->indexB);
       tty_port_destroy(&port->portA);
@@ -632,14 +631,14 @@ static void __exit vserial_exit(void) {
   mutex_unlock(&port_mutex);
 
   if (tty_driver) {
-    printk(KERN_INFO "vserial: [CLEANUP] Unregistering TTY driver (major=%d)\n",
-           tty_driver->major);
+    // printk(KERN_INFO "vserial: [CLEANUP] Unregistering TTY driver (major=%d)\n",
+    //        tty_driver->major);
     tty_unregister_driver(tty_driver);
     tty_driver_kref_put(tty_driver);
     tty_driver = NULL;
   }
 
-  printk(KERN_INFO "vserial: [CLEANUP] Module cleanup completed\n");
+  // printk(KERN_INFO "vserial: [CLEANUP] Module cleanup completed\n");
 }
 
 module_init(vserial_init);
