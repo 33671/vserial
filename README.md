@@ -10,7 +10,6 @@ This module creates virtual serialport pairs that can be used for communication 
 - [x] Support setting different baudrates and data formats(drops data silently if not matched)
 - [x] simple program for user-space management
 - [ ] soft/hard flow control
-- [ ] modem ioctl
 
 ## Installation
 
@@ -65,4 +64,5 @@ This module creates virtual serialport pairs that can be used for communication 
 
    ```bash
    paru -S vserial
+   vserialctl -s 1
    ```
