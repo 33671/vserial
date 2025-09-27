@@ -43,7 +43,7 @@ struct vserial_pairs_info {
   struct vserial_pair_info __user *pairs;
 };
 
-#define VSERIAL_TERMIOS_MASK (CSIZE | CSTOPB | PARENB | PARODD | CBAUD)
+#define VSERIAL_TERMIOS_MASK (CSIZE | CSTOPB | PARENB | PARODD)
 
 // Global data
 static struct tty_driver *tty_driver; // Our TTY driver
